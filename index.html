@@ -116,8 +116,8 @@
   </div>
 
   <div id="fcm-root-wrapper">
-    <!-- ==================== SCREEN 1: LOGIN PAGE ==================== -->
-    <div id="login-screen" class="w-full h-full flex items-center justify-center p-4 finti-hero-banner overflow-y-auto">
+    <!-- ==================== SCREEN 1: LOGIN PAGE (MODAL OVERLAY UNTUK ADMIN & BENDAHARA) ==================== -->
+    <div id="login-screen" class="hidden w-full h-full flex items-center justify-center p-4 finti-hero-banner overflow-y-auto fixed inset-0 z-50">
       <div class="finti-circle-deco w-96 h-96 bg-white/10 -top-20 -left-20"></div>
       <div class="finti-circle-deco w-[28rem] h-[28rem] bg-cyan-400/15 -bottom-32 -right-20"></div>
 
@@ -141,7 +141,8 @@
             </p>
           </div>
 
-          <div class="space-y-3 my-6">
+          <!-- Hanya tampil jika IS_PREVIEW === true -->
+          <div id="quick-demo-login-box" class="space-y-3 my-6">
             <div class="p-3.5 rounded-2xl bg-slate-800/90 border border-slate-700/70">
               <div class="text-[11px] font-semibold uppercase tracking-wider text-cyan-400 mb-2 flex items-center gap-1.5">
                 <i data-lucide="key-round" class="w-3.5 h-3.5"></i> Akun Demo Cepat (Klik untuk Isi)
@@ -155,10 +156,6 @@
                   <span><strong class="text-white">Bendahara</strong> <span class="text-slate-400">(bendahara)</span></span>
                   <span class="px-2 py-0.5 text-[10px] rounded-full bg-emerald-500/20 text-emerald-300 font-semibold">Keuangan</span>
                 </button>
-                <button type="button" onclick="fillQuickLogin('peserta','edudigital')" class="text-left px-3 py-2 rounded-xl bg-slate-900/90 hover:bg-amber-600/30 border border-slate-700 transition flex items-center justify-between">
-                  <span><strong class="text-white">Pengurus / Viewer</strong> <span class="text-slate-400">(peserta)</span></span>
-                  <span class="px-2 py-0.5 text-[10px] rounded-full bg-amber-500/20 text-amber-300 font-semibold">Read-Only</span>
-                </button>
               </div>
             </div>
           </div>
@@ -171,12 +168,17 @@
 
         <!-- Right Login Form -->
         <div class="lg:col-span-7 p-8 md:p-10 flex flex-col justify-center bg-white">
-          <div class="mb-6">
-            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-600 mb-2">
-              <i data-lucide="lock" class="w-3.5 h-3.5"></i> Portal Otentikasi Resmi
-            </span>
-            <h3 class="font-display text-2xl font-extrabold text-slate-900">Selamat Datang Kembali</h3>
-            <p class="text-sm text-slate-500 mt-1">Masuk menggunakan akun pengurus untuk mengakses dashboard kas futsal.</p>
+          <div class="flex items-center justify-between mb-6">
+            <div>
+              <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-600 mb-2">
+                <i data-lucide="lock" class="w-3.5 h-3.5"></i> Portal Otentikasi Pengurus Inti
+              </span>
+              <h3 class="font-display text-2xl font-extrabold text-slate-900">Login Admin & Bendahara</h3>
+              <p class="text-sm text-slate-500 mt-1">Masuk untuk mengelola input, edit, rekonsiliasi, dan pengaturan kas.</p>
+            </div>
+            <button type="button" onclick="closeLoginScreen()" class="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-semibold flex items-center gap-1">
+              <i data-lucide="arrow-left" class="w-4 h-4"></i> Dashboard
+            </button>
           </div>
 
           <div id="login-alert" class="hidden mb-4 p-3.5 rounded-2xl bg-red-50 border border-red-200 text-red-700 text-xs font-medium flex items-center gap-2">
@@ -189,7 +191,7 @@
               <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Username</label>
               <div class="relative">
                 <i data-lucide="user" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
-                <input id="login-username" type="text" required autocomplete="username" placeholder="Masukkan username (contoh: admin)"
+                <input id="login-username" type="text" required autocomplete="username" placeholder="Masukkan username (admin / bendahara)"
                   class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 bg-slate-50/60 focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none text-sm transition" />
               </div>
             </div>
@@ -206,23 +208,29 @@
               </div>
             </div>
 
-            <button id="login-submit-btn" type="submit"
-              class="w-full py-3.5 px-6 rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-[0.99] text-white font-display font-bold text-sm shadow-lg shadow-blue-600/25 transition flex items-center justify-center gap-2">
-              <i data-lucide="log-in" class="w-4 h-4"></i>
-              <span>Masuk ke Aplikasi</span>
-            </button>
+            <div class="flex flex-col sm:flex-row gap-2.5 pt-1">
+              <button id="login-submit-btn" type="submit"
+                class="flex-1 py-3.5 px-6 rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-[0.99] text-white font-display font-bold text-sm shadow-lg shadow-blue-600/25 transition flex items-center justify-center gap-2">
+                <i data-lucide="log-in" class="w-4 h-4"></i>
+                <span>Masuk sebagai Pengurus</span>
+              </button>
+              <button type="button" onclick="closeLoginScreen()"
+                class="py-3.5 px-5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-display font-bold text-xs transition">
+                Lihat Dashboard Tanpa Login
+              </button>
+            </div>
           </form>
 
           <div class="mt-6 pt-5 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-400">
-            <span>Password default demo: <code class="text-slate-600 font-semibold">edudigital</code> / <code class="text-slate-600 font-semibold">admin2026</code></span>
+            <span id="default-password-hint">Password default demo: <code class="text-slate-600 font-semibold">edudigital</code> / <code class="text-slate-600 font-semibold">admin2026</code></span>
             <span id="clock-login" class="font-medium text-slate-500"></span>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- ==================== SCREEN 2: MAIN APPLICATION SHELL ==================== -->
-    <div id="app-screen" class="hidden w-full h-full flex overflow-hidden bg-[#F8FAFC]">
+    <!-- ==================== SCREEN 2: MAIN APPLICATION SHELL (LANGSUNG TAMPIL) ==================== -->
+    <div id="app-screen" class="w-full h-full flex overflow-hidden bg-[#F8FAFC]">
       <!-- Mobile Backdrop -->
       <div id="sidebar-backdrop" onclick="toggleMobileSidebar(false)" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-30 hidden lg:hidden"></div>
 
@@ -310,14 +318,18 @@
                 <!-- Right Profile Area -->
                 <div class="flex items-center gap-3">
                   <div class="text-right hidden sm:block">
-                    <div class="text-xs font-bold leading-tight">Halo, <span id="header-user-name">Administrator</span></div>
+                    <div class="text-xs font-bold leading-tight">Halo, <span id="header-user-name">Pengurus / Publik</span></div>
                     <div class="flex items-center justify-end gap-1.5 mt-0.5">
-                      <span id="header-user-role" class="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-white/20 font-semibold">ADMIN</span>
+                      <span id="header-user-role" class="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-white/20 font-semibold">VIEWER</span>
                     </div>
                   </div>
+                  <button id="header-auth-btn" onclick="openLoginScreen()" class="px-3.5 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-display font-extrabold text-xs shadow-md flex items-center gap-1.5 transition">
+                    <i data-lucide="log-in" class="w-4 h-4"></i>
+                    <span>Login Admin / Bendahara</span>
+                  </button>
                   <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-400 to-orange-500 p-0.5 shadow-md">
                     <div id="header-user-initials" class="w-full h-full rounded-[10px] bg-slate-900/20 flex items-center justify-center font-display font-bold text-sm text-white">
-                      AD
+                      VW
                     </div>
                   </div>
                 </div>
@@ -421,7 +433,14 @@
     const SESSION_KEY = 'FCM_SESSION_TOKEN';
 
     let currentRoute = 'dashboard';
-    let currentUser = null;
+    const PUBLIC_VIEWER_USER = {
+      user_id: 'PUBLIC-VIEWER',
+      full_name: 'Pengurus / Publik (Tanpa Login)',
+      username: 'viewer',
+      email: '-',
+      role: 'VIEWER'
+    };
+    let currentUser = { ...PUBLIC_VIEWER_USER };
     let sessionToken = null;
     let isSubmittingLock = false; // Pencegahan submit ganda
     let chartInstances = {};
@@ -465,7 +484,7 @@
           { setting_key: 'currency', setting_value: 'IDR' },
           { setting_key: 'date_format', setting_value: 'DD/MM/YYYY' },
           { setting_key: 'timezone', setting_value: 'Asia/Jakarta' },
-          { setting_key: 'drive_folder_id', setting_value: 'FOLDER_BUKTI_TRANSAKSI_FUTSAL' },
+          { setting_key: 'drive_folder_id', setting_value: '1zy4Q-T2lylsY9COFf10HkKshk45RaqBP' },
           { setting_key: 'auto_backup', setting_value: 'WEEKLY' }
         ],
         Users: [
@@ -491,18 +510,6 @@
             role: 'BENDAHARA',
             status: 'ACTIVE',
             created_at: '2025-01-01 08:05:00',
-            last_login: now
-          },
-          {
-            user_id: 'USR-003',
-            full_name: 'Andi Wijaya (Pengurus)',
-            username: 'peserta',
-            email: 'pengurus@garudafutsal.id',
-            password_salt: 'SALT_VWR_03',
-            password_hash: simpleHash('edudigital', 'SALT_VWR_03'),
-            role: 'VIEWER',
-            status: 'ACTIVE',
-            created_at: '2025-01-01 08:10:00',
             last_login: now
           }
         ],
@@ -1301,6 +1308,65 @@
           return { success: true, data: newTx, message: 'Transfer antar akun berhasil dicatat tanpa mengubah total saldo keseluruhan.' };
         }
 
+        case 'UPDATE_TRANSACTION': {
+          requireRole(['ADMIN', 'BENDAHARA']);
+          const tx = db.Transactions.find(t => t.transaction_id === payload.transaction_id);
+          if (!tx) throw new Error('Transaksi yang akan diedit tidak ditemukan.');
+          if (tx.status === 'VOID') throw new Error('Transaksi berstatus VOID tidak dapat diedit.');
+
+          const amt = parseInt(payload.amount, 10);
+          if (!amt || amt <= 0) throw new Error('Nominal transaksi harus lebih besar dari Rp0.');
+
+          const oldCopy = JSON.parse(JSON.stringify(tx));
+
+          // Validasi sesuai jenis transaksi
+          if (tx.transaction_type === 'INCOME' || tx.transaction_type === 'ADJUSTMENT_IN') {
+            if (!payload.to_account_id) throw new Error('Akun tujuan wajib dipilih.');
+          } else if (tx.transaction_type === 'EXPENSE' || tx.transaction_type === 'ADVANCE_SETTLEMENT' || tx.transaction_type === 'ADJUSTMENT_OUT') {
+            if (!payload.from_account_id) throw new Error('Akun sumber dana wajib dipilih.');
+          } else if (tx.transaction_type === 'TRANSFER') {
+            if (!payload.from_account_id || !payload.to_account_id) throw new Error('Akun asal dan tujuan wajib dipilih.');
+            if (payload.from_account_id === payload.to_account_id) throw new Error('Akun asal dan akun tujuan tidak boleh sama!');
+          }
+
+          // Terapkan perubahan sementara untuk memvalidasi kecukupan saldo
+          tx.transaction_date = payload.transaction_date || tx.transaction_date;
+          if (payload.category_id !== undefined) tx.category_id = payload.category_id;
+          if (payload.from_account_id !== undefined) tx.from_account_id = payload.from_account_id;
+          if (payload.to_account_id !== undefined) tx.to_account_id = payload.to_account_id;
+          tx.amount = amt;
+          tx.description = payload.description || tx.description;
+          tx.related_party = payload.related_party !== undefined ? payload.related_party : tx.related_party;
+          if (payload.proof_url) {
+            tx.proof_url = payload.proof_url;
+            tx.proof_drive_file_id = tx.proof_drive_file_id || generateUid('DRV');
+          }
+          tx.updated_at = nowStr;
+
+          const checkState = calculateFinancialState();
+          if (tx.from_account_id && checkState.accountMap[tx.from_account_id]) {
+            const accAfter = checkState.accountMap[tx.from_account_id];
+            if (accAfter.current_balance < 0) {
+              // Rollback jika menyebabkan saldo akun menjadi negatif
+              Object.assign(tx, oldCopy);
+              throw new Error(`Perubahan ditolak: Menyebabkan saldo ${accAfter.account_name} menjadi negatif (${formatRupiah(accAfter.current_balance)}).`);
+            }
+          }
+
+          // Sinkronisasi jika transaksi ini adalah ADVANCE_SETTLEMENT (Pelunasan Talangan)
+          if (tx.transaction_type === 'ADVANCE_SETTLEMENT' && tx.related_id) {
+            const stl = db.AdvanceSettlements.find(s => s.settlement_id === tx.related_id);
+            if (stl) {
+              stl.settlement_date = tx.transaction_date;
+              stl.from_account_id = tx.from_account_id;
+              stl.amount = amt;
+            }
+          }
+
+          appendAuditLog('UPDATE_TRANSACTION', 'Transactions', tx.transaction_id, oldCopy, tx);
+          return { success: true, data: tx, message: `Transaksi ${tx.transaction_id} berhasil diperbarui dan saldo telah dihitung ulang.` };
+        }
+
         case 'VOID_TRANSACTION': {
           requireRole(['ADMIN']);
           const { transaction_id, void_reason } = payload;
@@ -1349,15 +1415,23 @@
           requireRole(['ADMIN', 'BENDAHARA']);
           const adv = db.Advances.find(a => a.advance_id === payload.advance_id);
           if (!adv) throw new Error('Data talangan tidak ditemukan.');
+          const amt = parseInt(payload.amount, 10) || adv.amount;
+          if (amt <= 0) throw new Error('Nominal talangan harus lebih besar dari Rp0.');
+
           const state = calculateFinancialState();
           const comp = state.advances.find(a => a.advance_id === payload.advance_id);
-          if (comp && comp.status === 'Lunas') {
-            throw new Error('Talangan yang sudah Lunas tidak dapat diubah keterangannya.');
+          if (comp && amt < comp.paid_amount) {
+            throw new Error(`Nominal talangan baru (${formatRupiah(amt)}) tidak boleh lebih kecil dari jumlah yang sudah dibayar (${formatRupiah(comp.paid_amount)}).`);
           }
+
           const oldCopy = { ...adv };
+          if (payload.advance_date) adv.advance_date = payload.advance_date;
+          if (payload.person_name) adv.person_name = payload.person_name.trim();
+          if (payload.category_id) adv.category_id = payload.category_id;
+          adv.amount = amt;
           adv.description = payload.description;
           appendAuditLog('UPDATE_ADVANCE', 'Advances', adv.advance_id, oldCopy, adv);
-          return { success: true, message: 'Keterangan dana talangan berhasil diperbarui.' };
+          return { success: true, message: 'Data dana talangan berhasil diperbarui.' };
         }
 
         case 'SETTLE_ADVANCE': {
@@ -1635,10 +1709,139 @@
     // ============================================================================
     // 5. LOGIN, LOGOUT & SESSION MANAGEMENT
     // ============================================================================
+    function applyPreviewVisibilityRules() {
+      const demoBox = document.getElementById('quick-demo-login-box');
+      const hintBox = document.getElementById('default-password-hint');
+      if (!IS_PREVIEW) {
+        if (demoBox) demoBox.classList.add('hidden');
+        if (hintBox) hintBox.classList.add('hidden');
+      } else {
+        if (demoBox) demoBox.classList.remove('hidden');
+        if (hintBox) hintBox.classList.remove('hidden');
+      }
+    }
+
+    function openLoginScreen() {
+      applyPreviewVisibilityRules();
+      document.getElementById('login-alert').classList.add('hidden');
+      document.getElementById('login-screen').classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function closeLoginScreen() {
+      document.getElementById('login-screen').classList.add('hidden');
+    }
+
     function fillQuickLogin(username, password) {
+      if (!IS_PREVIEW) return;
       document.getElementById('login-username').value = username;
       document.getElementById('login-password').value = password;
       document.getElementById('login-alert').classList.add('hidden');
+    }
+
+    function togglePasswordVisibility() {
+      const input = document.getElementById('login-password');
+      const icon = document.getElementById('password-eye-icon');
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.setAttribute('data-lucide', 'eye-off');
+      } else {
+        input.type = 'password';
+        icon.setAttribute('data-lucide', 'eye');
+      }
+      lucide.createIcons();
+    }
+
+    async function handleLoginSubmit(e) {
+      e.preventDefault();
+      if (isSubmittingLock) return;
+      isSubmittingLock = true;
+
+      const username = document.getElementById('login-username').value.trim();
+      const password = document.getElementById('login-password').value;
+      const alertBox = document.getElementById('login-alert');
+      const alertText = document.getElementById('login-alert-text');
+      const btn = document.getElementById('login-submit-btn');
+
+      alertBox.classList.add('hidden');
+      btn.disabled = true;
+      btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> <span>Memverifikasi...</span>`;
+      lucide.createIcons();
+
+      try {
+        const res = await callBackend('LOGIN', { username, password });
+        if (!res.success) {
+          alertText.textContent = res.message || 'Gagal masuk. Periksa kembali kredensial Anda.';
+          alertBox.classList.remove('hidden');
+        } else {
+          currentUser = res.user;
+          sessionToken = res.token;
+          sessionStorage.setItem(SESSION_KEY, JSON.stringify({ user: currentUser, token: sessionToken }));
+          showToast(`Selamat datang, ${currentUser.full_name}!`, 'success');
+          enterAppShell();
+        }
+      } catch (err) {
+        alertText.textContent = err.message || 'Terjadi kesalahan koneksi server.';
+        alertBox.classList.remove('hidden');
+      } finally {
+        isSubmittingLock = false;
+        btn.disabled = false;
+        btn.innerHTML = `<i data-lucide="log-in" class="w-4 h-4"></i> <span>Masuk sebagai Pengurus</span>`;
+        lucide.createIcons();
+      }
+    }
+
+    function handleLogout() {
+      sessionStorage.removeItem(SESSION_KEY);
+      currentUser = { ...PUBLIC_VIEWER_USER };
+      sessionToken = null;
+      enterAppShell();
+      showToast('Anda telah keluar dan kembali ke Mode Dashboard Viewer.', 'info');
+    }
+
+    function enterAppShell() {
+      if (!currentUser) {
+        currentUser = { ...PUBLIC_VIEWER_USER };
+      }
+      document.getElementById('login-screen').classList.add('hidden');
+      document.getElementById('app-screen').classList.remove('hidden');
+
+      // Update Header User Info
+      const isPublicViewer = currentUser.role === 'VIEWER';
+      document.getElementById('header-user-name').textContent = isPublicViewer ? 'Pengurus / Publik' : currentUser.full_name.split(' ')[0];
+      document.getElementById('header-user-role').textContent = isPublicViewer ? 'MODE VIEWER (TANPA LOGIN)' : currentUser.role;
+      const initials = isPublicViewer ? 'VW' : currentUser.full_name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
+      document.getElementById('header-user-initials').textContent = initials;
+
+      const authBtn = document.getElementById('header-auth-btn');
+      if (authBtn) {
+        if (isPublicViewer) {
+          authBtn.setAttribute('onclick', 'openLoginScreen()');
+          authBtn.className = 'px-3.5 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-display font-extrabold text-xs shadow-md flex items-center gap-1.5 transition';
+          authBtn.innerHTML = `<i data-lucide="log-in" class="w-4 h-4"></i> <span>Login Admin / Bendahara</span>`;
+        } else {
+          authBtn.setAttribute('onclick', 'handleLogout()');
+          authBtn.className = 'px-3.5 py-2 rounded-xl bg-white/15 hover:bg-white/25 text-white font-display font-bold text-xs border border-white/20 flex items-center gap-1.5 transition';
+          authBtn.innerHTML = `<i data-lucide="log-out" class="w-4 h-4"></i> <span>Keluar</span>`;
+        }
+      }
+
+      // Sembunyikan tombol quick input jika VIEWER
+      const quickActions = document.getElementById('header-quick-actions');
+      if (isPublicViewer) {
+        quickActions.classList.add('hidden');
+      } else {
+        quickActions.classList.remove('hidden');
+      }
+
+      // Update nama klub dari Settings
+      const appTitle = db.Settings.find(s => s.setting_key === 'app_name')?.setting_value || 'FUTSAL CASH';
+      const clubName = db.Settings.find(s => s.setting_key === 'club_name')?.setting_value || 'Garuda Futsal Club';
+      document.getElementById('sidebar-app-title').textContent = appTitle.slice(0, 18);
+      document.getElementById('sidebar-club-name').textContent = clubName;
+
+      renderSidebarMenu();
+      navigateTo(currentRoute || 'dashboard');
     }
 
     function togglePasswordVisibility() {
@@ -1775,7 +1978,8 @@
         items: [
           { id: 'audit-logs', label: 'Riwayat Aktivitas', lucide: 'history', roles: ['ADMIN'] },
           { id: 'settings', label: 'Pengaturan & Uji', lucide: 'settings', roles: ['ADMIN'] },
-          { id: 'logout', label: 'Keluar', lucide: 'log-out', roles: ['ADMIN', 'BENDAHARA', 'VIEWER'] }
+          { id: 'login-trigger', label: 'Login Admin / Bendahara', lucide: 'log-in', roles: ['VIEWER'] },
+          { id: 'logout', label: 'Keluar (Mode Viewer)', lucide: 'log-out', roles: ['ADMIN', 'BENDAHARA'] }
         ]
       }
     ];
@@ -1796,17 +2000,25 @@
               ${visibleItems.map(item => {
                 const isActive = currentRoute === item.id;
                 const isLogout = item.id === 'logout';
+                const isLoginTrigger = item.id === 'login-trigger';
+                const clickHandler = isLogout
+                  ? 'handleLogout()'
+                  : isLoginTrigger
+                    ? 'openLoginScreen()'
+                    : `navigateTo('${item.id}')`;
                 return `
-                  <button onclick="${isLogout ? 'handleLogout()' : `navigateTo('${item.id}')`}"
+                  <button onclick="${clickHandler}"
                     class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold transition ${
                       isActive
                         ? 'bg-blue-50 text-blue-600 shadow-2xs'
                         : isLogout
                           ? 'text-rose-600 hover:bg-rose-50'
-                          : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                          : isLoginTrigger
+                            ? 'text-blue-600 bg-blue-50/60 hover:bg-blue-100/70'
+                            : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
                     }">
                     <span class="flex items-center gap-2.5">
-                      <i data-lucide="${item.lucide}" class="w-4 h-4 ${isActive ? 'text-blue-600' : isLogout ? 'text-rose-500' : 'text-slate-400'}"></i>
+                      <i data-lucide="${item.lucide}" class="w-4 h-4 ${isActive || isLoginTrigger ? 'text-blue-600' : isLogout ? 'text-rose-500' : 'text-slate-400'}"></i>
                       <span>${item.label}</span>
                     </span>
                     <i data-lucide="chevron-right" class="w-3.5 h-3.5 ${isActive ? 'text-blue-600 opacity-100' : 'text-slate-300 opacity-60'}"></i>
@@ -2322,6 +2534,11 @@
                 <button onclick="showTransactionDetailModal('${tx.transaction_id}')" title="Detail & Bukti" class="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600">
                   <i data-lucide="eye" class="w-3.5 h-3.5"></i>
                 </button>
+                ${currentUser.role !== 'VIEWER' && !isVoid ? `
+                  <button onclick="openEditTransactionModal('${tx.transaction_id}')" title="Edit Transaksi" class="p-2 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-600">
+                    <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
+                  </button>
+                ` : ''}
                 ${currentUser.role === 'ADMIN' && !isVoid ? `
                   <button onclick="openVoidModal('${tx.transaction_id}')" title="Batalkan Transaksi (VOID)" class="p-2 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600">
                     <i data-lucide="ban" class="w-3.5 h-3.5"></i>
@@ -2566,6 +2783,11 @@
                       <button onclick="showTransactionDetailModal('${tx.transaction_id}')" class="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600">
                         <i data-lucide="eye" class="w-3.5 h-3.5"></i>
                       </button>
+                      ${currentUser.role !== 'VIEWER' && !isVoid ? `
+                        <button onclick="openEditTransactionModal('${tx.transaction_id}')" title="Edit Transaksi" class="p-2 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-600">
+                          <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
+                        </button>
+                      ` : ''}
                       ${currentUser.role === 'ADMIN' && !isVoid ? `
                         <button onclick="openVoidModal('${tx.transaction_id}')" class="p-2 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600">
                           <i data-lucide="ban" class="w-3.5 h-3.5"></i>
@@ -2752,6 +2974,11 @@
                       <button onclick="showTransactionDetailModal('${tx.transaction_id}')" class="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600">
                         <i data-lucide="eye" class="w-4 h-4"></i>
                       </button>
+                      ${currentUser.role !== 'VIEWER' && !isVoid ? `
+                        <button onclick="openEditTransactionModal('${tx.transaction_id}')" title="Edit Transfer" class="p-2 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-600">
+                          <i data-lucide="pencil" class="w-4 h-4"></i>
+                        </button>
+                      ` : ''}
                       ${currentUser.role === 'ADMIN' && !isVoid ? `
                         <button onclick="openVoidModal('${tx.transaction_id}')" class="p-2 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600">
                           <i data-lucide="ban" class="w-4 h-4"></i>
@@ -2963,7 +3190,9 @@
                           <button onclick="openSettleAdvanceModal('${adv.advance_id}')" class="px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold flex items-center gap-1 shadow-xs">
                             <i data-lucide="wallet" class="w-3.5 h-3.5"></i> Bayar / Cicil
                           </button>
-                          <button onclick="openEditAdvanceDescModal('${adv.advance_id}')" title="Edit Keterangan" class="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600">
+                        ` : ''}
+                        ${!isReadOnly ? `
+                          <button onclick="openEditAdvanceDescModal('${adv.advance_id}')" title="Edit Data Talangan" class="p-2 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-600">
                             <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
                           </button>
                         ` : ''}
@@ -3099,15 +3328,36 @@
     function openEditAdvanceDescModal(advanceId) {
       const adv = db.Advances.find(a => a.advance_id === advanceId);
       if (!adv) return;
+      const expCategories = db.Categories.filter(c => c.category_type === 'EXPENSE' && c.is_active);
       openModal(
-        `Edit Keterangan Talangan (${adv.advance_id})`,
+        `Edit Transaksi Dana Talangan (${adv.advance_id})`,
         `
-          <form onsubmit="handleConfirmEditAdvanceDesc(event, '${adv.advance_id}')" class="space-y-4">
+          <form onsubmit="handleConfirmEditAdvanceDesc(event, '${adv.advance_id}')" class="space-y-3.5">
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Tanggal Talangan *</label>
+                <input type="date" id="edit-adv-date" required value="${adv.advance_date}" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs" />
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Kategori Beban *</label>
+                <select id="edit-adv-cat" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs bg-white">
+                  ${expCategories.map(c => `<option value="${c.category_id}" ${c.category_id === adv.category_id ? 'selected' : ''}>${c.category_name}</option>`).join('')}
+                </select>
+              </div>
+            </div>
             <div>
-              <label class="block text-xs font-semibold text-slate-700 mb-1">Keterangan Baru *</label>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Nama Pengurus *</label>
+              <input type="text" id="edit-adv-person" required value="${adv.person_name}" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs" />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Nominal Talangan (Rp) *</label>
+              <input type="number" id="edit-adv-amount" required min="1" value="${adv.amount}" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm font-bold" />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Keterangan *</label>
               <textarea id="edit-adv-desc" required rows="3" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs">${adv.description}</textarea>
             </div>
-            <button type="submit" class="w-full py-2.5 rounded-xl bg-blue-600 text-white font-bold text-xs">Simpan Perubahan</button>
+            <button type="submit" class="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-display font-bold text-xs shadow-lg">Simpan Perubahan Talangan</button>
           </form>
         `
       );
@@ -3118,6 +3368,10 @@
       try {
         const res = await callBackend('UPDATE_ADVANCE_DESC', {
           advance_id: advanceId,
+          advance_date: document.getElementById('edit-adv-date').value,
+          category_id: document.getElementById('edit-adv-cat').value,
+          person_name: document.getElementById('edit-adv-person').value,
+          amount: parseInt(document.getElementById('edit-adv-amount').value, 10),
           description: document.getElementById('edit-adv-desc').value
         });
         closeModal();
@@ -4373,6 +4627,127 @@
       );
     }
 
+    function openEditTransactionModal(txId) {
+      const tx = db.Transactions.find(t => t.transaction_id === txId);
+      if (!tx) return;
+      if (tx.status === 'VOID') {
+        showToast('Transaksi berstatus VOID tidak dapat diedit.', 'error');
+        return;
+      }
+
+      const state = calculateFinancialState();
+      const activeAccounts = state.accounts.filter(a => a.is_active);
+      const isIncome = tx.transaction_type === 'INCOME';
+      const isExpense = tx.transaction_type === 'EXPENSE';
+      const isTransfer = tx.transaction_type === 'TRANSFER';
+      const isSettlement = tx.transaction_type === 'ADVANCE_SETTLEMENT';
+      const isAdjIn = tx.transaction_type === 'ADJUSTMENT_IN';
+      const isAdjOut = tx.transaction_type === 'ADJUSTMENT_OUT';
+
+      const relevantCategories = db.Categories.filter(c =>
+        isIncome ? c.category_type === 'INCOME' : c.category_type === 'EXPENSE'
+      );
+
+      openModal(
+        `Edit Transaksi — ${tx.transaction_id} (${tx.transaction_type})`,
+        `
+          <form onsubmit="handleConfirmEditTransaction(event, '${tx.transaction_id}')" class="space-y-3.5">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Tanggal Transaksi *</label>
+                <input type="date" id="edit-tx-date" required value="${String(tx.transaction_date).slice(0, 10)}" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs" />
+              </div>
+
+              ${(isIncome || isExpense) ? `
+                <div>
+                  <label class="block text-xs font-semibold text-slate-700 mb-1">Kategori *</label>
+                  <select id="edit-tx-category" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs bg-white">
+                    ${relevantCategories.map(c => `<option value="${c.category_id}" ${c.category_id === tx.category_id ? 'selected' : ''}>${c.category_name}</option>`).join('')}
+                  </select>
+                </div>
+              ` : `
+                <div>
+                  <label class="block text-xs font-semibold text-slate-700 mb-1">Jenis Mutasi</label>
+                  <input type="text" disabled value="${tx.transaction_type}" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-100 text-slate-500 text-xs font-bold" />
+                </div>
+              `}
+            </div>
+
+            ${(isExpense || isTransfer || isSettlement || isAdjOut) ? `
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Akun Sumber Dana *</label>
+                <select id="edit-tx-from-acc" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs bg-white">
+                  ${activeAccounts.map(a => `<option value="${a.account_id}" ${a.account_id === tx.from_account_id ? 'selected' : ''}>${a.account_name} (Saldo: ${formatRupiah(a.current_balance)})</option>`).join('')}
+                </select>
+              </div>
+            ` : ''}
+
+            ${(isIncome || isTransfer || isAdjIn) ? `
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Akun Tujuan (Penerima) *</label>
+                <select id="edit-tx-to-acc" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs bg-white">
+                  ${activeAccounts.map(a => `<option value="${a.account_id}" ${a.account_id === tx.to_account_id ? 'selected' : ''}>${a.account_name} (Saldo: ${formatRupiah(a.current_balance)})</option>`).join('')}
+                </select>
+              </div>
+            ` : ''}
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Nominal Rupiah (Rp) *</label>
+              <input type="number" id="edit-tx-amount" required min="1" value="${tx.amount}" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm font-extrabold text-slate-900" />
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Pihak Terkait (Penyetor / Penerima)</label>
+              <input type="text" id="edit-tx-party" value="${tx.related_party || ''}" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs" />
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Keterangan Lengkap *</label>
+              <textarea id="edit-tx-desc" required rows="2" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs">${tx.description || ''}</textarea>
+            </div>
+
+            <div class="p-3 rounded-xl bg-blue-50 border border-blue-100 text-[11px] text-blue-800">
+              Setiap perubahan transaksi otomatis menghitung ulang saldo akun terkait dan mencatat data sebelum & sesudah perubahan ke dalam <strong>Audit Log</strong>.
+            </div>
+
+            <button type="submit" class="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-display font-bold text-xs shadow-lg">
+              Simpan Perubahan Transaksi
+            </button>
+          </form>
+        `
+      );
+    }
+
+    async function handleConfirmEditTransaction(e, txId) {
+      e.preventDefault();
+      if (isSubmittingLock) return;
+      isSubmittingLock = true;
+      try {
+        const tx = db.Transactions.find(t => t.transaction_id === txId);
+        if (!tx) throw new Error('Transaksi tidak ditemukan.');
+
+        const payload = {
+          transaction_id: txId,
+          transaction_date: document.getElementById('edit-tx-date').value,
+          category_id: document.getElementById('edit-tx-category') ? document.getElementById('edit-tx-category').value : tx.category_id,
+          from_account_id: document.getElementById('edit-tx-from-acc') ? document.getElementById('edit-tx-from-acc').value : tx.from_account_id,
+          to_account_id: document.getElementById('edit-tx-to-acc') ? document.getElementById('edit-tx-to-acc').value : tx.to_account_id,
+          amount: parseInt(document.getElementById('edit-tx-amount').value, 10),
+          related_party: document.getElementById('edit-tx-party').value,
+          description: document.getElementById('edit-tx-desc').value
+        };
+
+        const res = await callBackend('UPDATE_TRANSACTION', payload);
+        closeModal();
+        showToast(res.message, 'success');
+        navigateTo(currentRoute);
+      } catch (err) {
+        showToast(err.message, 'error');
+      } finally {
+        isSubmittingLock = false;
+      }
+    }
+
     function openVoidModal(txId) {
       const tx = db.Transactions.find(t => t.transaction_id === txId);
       if (!tx) return;
@@ -4434,6 +4809,8 @@
     // 18. INITIALIZATION ON WINDOW LOAD
     // ============================================================================
     window.onload = function() {
+      applyPreviewVisibilityRules();
+
       const badge = document.getElementById('login-mode-badge');
       if (badge) {
         badge.textContent = IS_PREVIEW ? 'Mode Preview Aktif' : 'Terhubung ke Google Apps Script';
@@ -4443,7 +4820,7 @@
         clock.textContent = new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
       }
 
-      // Cek apakah ada sesi tersimpan
+      // Cek apakah ada sesi login Admin / Bendahara tersimpan
       try {
         const savedSession = sessionStorage.getItem(SESSION_KEY);
         if (savedSession) {
@@ -4451,12 +4828,12 @@
           if (parsed && parsed.user) {
             currentUser = parsed.user;
             sessionToken = parsed.token;
-            enterAppShell();
-            return;
           }
         }
       } catch (e) {}
 
+      // Langsung tampilkan Dashboard tanpa wajib login (Default: Mode Viewer/Pengurus)
+      enterAppShell();
       lucide.createIcons();
     };
   </script>
